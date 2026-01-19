@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+
+<html lang="el">
+<head>
+<meta charset="utf-8"/>
+<title>Beauty Salon</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="admin.css" rel="stylesheet"/>
+</head>
+<body class="access-locked">
+<div class="access-gate" id="access-gate" role="dialog" aria-modal="true" aria-labelledby="access-gate-title">
+  <div class="access-gate-card">
+    <h1 class="access-gate-title" id="access-gate-title">Πρόσβαση Demo</h1>
+    <p class="access-gate-subtitle">Εισάγετε τον κωδικό πρόσβασης.</p>
+    <form class="access-gate-form" id="access-gate-form">
+      <input class="access-gate-input" id="access-gate-input" type="password" placeholder="Κωδικός" autocomplete="current-password" required/>
+      <button class="btn-primary" type="submit">Είσοδος</button>
+    </form>
+    <p class="access-gate-error" id="access-gate-error" hidden>Λάθος κωδικός.</p>
+  </div>
+</div>
+<script>
+(function () {
+  if (window.__accessGateInit) return;
+  var accessGate = document.getElementById('access-gate');
+  if (!accessGate) return;
+  window.__accessGateInit = true;
+  var accessForm = document.getElementById('access-gate-form');
+  var accessInput = document.getElementById('access-gate-input');
+  var accessError = document.getElementById('access-gate-error');
+  var accessPassword = 'demo123';
+
+  function lockAccess() {
+    document.body.classList.add('access-locked');
+    accessGate.hidden = false;
+    var target = document.querySelector('.admin-page');
+    if (target) target.setAttribute('aria-hidden', 'true');
+    if (accessInput) accessInput.focus();
+  }
+
+  function unlockAccess() {
+    document.body.classList.remove('access-locked');
+    accessGate.hidden = true;
+    var target = document.querySelector('.admin-page');
+    if (target) target.removeAttribute('aria-hidden');
+    if (accessInput) accessInput.value = '';
+    if (accessError) accessError.hidden = true;
+  }
+
+  var isUnlocked = false;
+
+  if (isUnlocked) {
+    unlockAccess();
+  } else {
+    lockAccess();
+  }
+
+  if (accessForm) {
+    accessForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!accessInput) return;
+      var value = accessInput.value.trim();
+      if (value === accessPassword) {
+        unlockAccess();
+      } else {
+        if (accessError) accessError.hidden = false;
+        accessInput.value = '';
+        accessInput.focus();
+      }
+    });
+  }
+
+  if (accessInput) {
+    accessInput.addEventListener('input', function () {
+      if (accessError) accessError.hidden = true;
+    });
+  }
+})();
+</script>
+<div class="admin-page">
+<aside class="admin-sidebar">
+<div class="admin-logo">
+<div class="admin-logo-mark">BS</div>
+<div class="admin-logo-text">
+<span class="admin-logo-title">Beauty Salon</span>
+
+</div>
+</div>
+<button aria-label="Άνοιγμα/κλείσιμο πλοήγησης" aria-controls="admin-nav" aria-expanded="false" class="admin-nav-toggle" type="button">
+            Μενού
+        </button>
+<nav id="admin-nav" aria-label="Κύριες ενότητες" class="admin-nav">
+<button class="admin-nav-item admin-nav-item--active" data-section="calendar">
+<span class="admin-nav-label">Ημερολόγιο</span>
+</button>
+<button class="admin-nav-item" data-section="dashboard">
+<span class="admin-nav-label">Επισκόπηση</span>
+</button>
+<button class="admin-nav-item" data-section="customers">
+<span class="admin-nav-label">Πελάτες</span>
+</button>
+<button class="admin-nav-item" data-section="settings">
+<span class="admin-nav-label">Ρυθμίσεις</span>
+</button>
+</nav>
+</aside>
+<main class="admin-main">
+<section class="admin-section" data-section="dashboard">
+<section class="admin-block dashboard-block">
+<div class="admin-block-header">
+<div>
+<h2 class="admin-block-title">Επισκόπηση CRM</h2>
+<p class="admin-block-subtitle">
+Συνοπτικά KPIs και αναλύσεις από τα ραντεβού, τους πελάτες, τις υπηρεσίες και το ωράριο που έχεις καταχωρήσει.
+</p>
+</div>
+
+<div class="admin-block-actions dashboard-actions">
+<div class="dash-date-controls">
+<label class="dash-date-label" for="dash-date-range">Ημερομηνία αναφοράς</label>
+<div class="dash-date-fields">
+<select class="control dash-date-select" id="dash-date-range">
+<option value="day">Ημέρα</option>
+<option value="week">Εβδομάδα</option>
+<option value="month">Μήνας</option>
+<option value="half-year">6 μήνες</option>
+<option value="year">Έτος</option>
+<option value="custom">Συγκεκριμένη ημερομηνία</option>
+</select>
+<input class="control control--date dash-date-input" id="dash-date-input" type="date"/>
+<select class="control dash-date-select dash-year-select" id="dash-year-select" hidden>
+<option value="">—</option>
+</select>
+<select class="control dash-date-select dash-half-year-select" id="dash-half-year-select" hidden>
+<option value="H1">Ιαν – Ιουν</option>
+<option value="H2">Ιουλ – Δεκ</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dash-tabs" role="tablist" aria-label="Κατηγορίες επισκόπησης">
+  <button type="button" class="dash-tab dash-tab--active" role="tab" id="dash-tab-economics" aria-selected="true" aria-controls="dash-tabpanel-economics" data-dash-tab="economics">Οικονομική Ανάλυση</button>
+  <button type="button" class="dash-tab" role="tab" id="dash-tab-operations" aria-selected="false" aria-controls="dash-tabpanel-operations" tabindex="-1" data-dash-tab="operations">Λειτουργία & Ραντεβού</button>
+  <button type="button" class="dash-tab" role="tab" id="dash-tab-customers" aria-selected="false" aria-controls="dash-tabpanel-customers" tabindex="-1" data-dash-tab="customers">Πελάτες</button>
+<button type="button" class="dash-tab" role="tab" id="dash-tab-exports" aria-selected="false" aria-controls="dash-tabpanel-exports" tabindex="-1" data-dash-tab="exports">Εξαγωγές</button>
+  <button type="button" class="dash-tab" role="tab" id="dash-tab-advanced" aria-selected="false" aria-controls="dash-tabpanel-advanced" tabindex="-1" data-dash-tab="advanced">Προχωρημένα (Backend)</button>
+</div>
+
+<div class="dash-tabpanels">
+      <div class="dash-tabpanel" role="tabpanel" id="dash-tabpanel-economics" aria-labelledby="dash-tab-economics" data-dash-tabpanel="economics">
+        <div class="dashboard-kpi-grid dash-econ-kpis" aria-label="Οικονομικοί δείκτες">
+      <article class="admin-card stat-card stat-card--kpi">
+        <div class="stat-head">
+          <div class="stat-trend stat-trend--up" id="dash-kpi-revenue-trend">—</div>
+        </div>
+        <h3 class="stat-title">Σύνολο εσόδων</h3>
+        <p class="stat-value" id="dash-kpi-revenue">—</p>
+        <p class="stat-meta" id="dash-kpi-revenue-meta">Διαφορά: —</p>
+        <p class="stat-compare">Σε σχέση με την προηγούμενη περίοδο</p>
+      </article>
+
+      <article class="admin-card stat-card stat-card--kpi">
+        <div class="stat-head">
+          <div class="stat-trend stat-trend--up" id="dash-kpi-service-sales-trend">—</div>
+        </div>
+        <h3 class="stat-title">Υπηρεσίες πουλήθηκαν</h3>
+        <p class="stat-value" id="dash-kpi-service-sales">—</p>
+        <p class="stat-meta" id="dash-kpi-service-sales-meta">Διαφορά: —</p>
+        <p class="stat-compare">Σε σχέση με την προηγούμενη περίοδο</p>
+      </article>
+
+      <article class="admin-card stat-card stat-card--kpi">
+        <div class="stat-head">
+          <div class="stat-trend stat-trend--down" id="dash-kpi-revenue-per-hour-trend">—</div>
+        </div>
+        <h3 class="stat-title">Έσοδα ανά ώρα λειτουργίας</h3>
+        <p class="stat-value" id="dash-kpi-revenue-per-hour">—</p>
+        <p class="stat-meta" id="dash-kpi-revenue-per-hour-meta">Διαφορά: —</p>
+        <p class="stat-compare">Σε σχέση με την προηγούμενη περίοδο</p>
+      </article>
+    </div>
+
+    <div class="dashboard-grid dash-econ-charts">
+      <article class="admin-card dashboard-panel dash-chart-panel dash-chart-panel--wide">
+        <div class="dash-chart-header">
+          <div>
+            <h3 class="dashboard-panel-title">Επισκόπηση εσόδων</h3>
+            <p class="dash-note">Μηνιαία εξέλιξη εσόδων.</p>
+          </div>
+          <div class="dash-chart-legend">
+            <span class="dash-legend-item dash-legend-item--revenue">Έσοδα</span>
+          </div>
+        </div>
+        <div class="dash-line-chart-wrap">
+          <svg class="dash-line-chart" viewBox="0 0 640 240" role="img" aria-label="Διάγραμμα εσόδων">
+            <g class="dash-chart-grid">
+              <line x1="40" y1="30" x2="620" y2="30" />
+              <line x1="40" y1="80" x2="620" y2="80" />
+              <line x1="40" y1="130" x2="620" y2="130" />
+              <line x1="40" y1="180" x2="620" y2="180" />
+            </g>
+            <path class="dash-line-chart-line dash-line-chart-line--revenue" d="M40 150 C110 120, 170 110, 220 100 C280 90, 320 120, 380 110 C440 100, 500 80, 560 90 C590 95, 610 85, 620 75" />
+          </svg>
+          <div class="dash-chart-x">
+            <span>Ιαν</span><span>Φεβ</span><span>Μαρ</span><span>Απρ</span><span>Μαι</span><span>Ιουν</span><span>Ιουλ</span><span>Αυγ</span><span>Σεπ</span><span>Οκτ</span><span>Νοε</span><span>Δεκ</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="admin-card dashboard-panel dash-chart-panel">
+        <div class="dash-chart-header">
+          <div>
+            <h3 class="dashboard-panel-title">Δημοφιλείς υπηρεσίες</h3>
+            <p class="dash-note">Κατανομή κρατήσεων ανά υπηρεσία.</p>
+          </div>
+        </div>
+        <div class="dash-donut-wrap">
+          <svg class="dash-donut" viewBox="0 0 120 120" role="img" aria-label="Κατανομή υπηρεσιών">
+            <circle class="dash-donut-track" cx="60" cy="60" r="42" />
+            <circle class="dash-donut-slice dash-donut-slice--a" cx="60" cy="60" r="42" pathLength="100" stroke-dasharray="35 65" stroke-dashoffset="0" />
+            <circle class="dash-donut-slice dash-donut-slice--b" cx="60" cy="60" r="42" pathLength="100" stroke-dasharray="25 75" stroke-dashoffset="-35" />
+            <circle class="dash-donut-slice dash-donut-slice--c" cx="60" cy="60" r="42" pathLength="100" stroke-dasharray="18 82" stroke-dashoffset="-60" />
+            <circle class="dash-donut-slice dash-donut-slice--d" cx="60" cy="60" r="42" pathLength="100" stroke-dasharray="12 88" stroke-dashoffset="-78" />
+            <circle class="dash-donut-slice dash-donut-slice--e" cx="60" cy="60" r="42" pathLength="100" stroke-dasharray="10 90" stroke-dashoffset="-90" />
+          </svg>
+          <div class="dash-donut-legend">
+            <div class="dash-legend-row"><span class="dash-legend-dot dash-legend-dot--a"></span><span>Gel Manicure</span><strong>35%</strong></div>
+            <div class="dash-legend-row"><span class="dash-legend-dot dash-legend-dot--b"></span><span>Acrylic Set</span><strong>25%</strong></div>
+            <div class="dash-legend-row"><span class="dash-legend-dot dash-legend-dot--c"></span><span>Hair Color</span><strong>18%</strong></div>
+            <div class="dash-legend-row"><span class="dash-legend-dot dash-legend-dot--d"></span><span>Facial</span><strong>12%</strong></div>
+            <div class="dash-legend-row"><span class="dash-legend-dot dash-legend-dot--e"></span><span>Massage</span><strong>10%</strong></div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="dashboard-grid dash-econ-secondary">
+      <article class="admin-card dashboard-panel">
+        <h3 class="dashboard-panel-title">Κορυφαίες υπηρεσίες (κρατήσεις)</h3>
+        <ul class="dash-bars" id="dash-top-services"></ul>
+        <p class="dash-note">Υπολογίζεται από τις υπηρεσίες που εμφανίζονται στα ραντεβού της ημέρας.</p>
+      </article>
+
+      <article class="admin-card dashboard-panel">
+        <h3 class="dashboard-panel-title">Έσοδα ανά υπηρεσία</h3>
+        <ul class="dash-bars" id="dash-revenue-by-service"></ul>
+        <p class="dash-note">Εκτίμηση με βάση τις τιμές στον κατάλογο «Υπηρεσίες».</p>
+      </article>
+
+      </div>
+  </div><div class="dash-tabpanel" role="tabpanel" id="dash-tabpanel-operations" aria-labelledby="dash-tab-operations" data-dash-tabpanel="operations" hidden>
+    <div class="dashboard-kpi-grid" aria-label="Δείκτες λειτουργίας και ραντεβού">
+      <article class="admin-card stat-card">
+<h3 class="stat-title">Ραντεβού</h3>
+<p class="stat-value" id="dash-kpi-appointments">—</p>
+<p class="stat-meta" id="dash-kpi-appointments-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Ολοκληρώθηκαν</h3>
+<p class="stat-value" id="dash-kpi-completed">—</p>
+<p class="stat-meta" id="dash-kpi-completed-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Σε αναμονή</h3>
+<p class="stat-value" id="dash-kpi-pending">—</p>
+<p class="stat-meta" id="dash-kpi-pending-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Ακυρώσεις</h3>
+<p class="stat-value" id="dash-kpi-cancellations">—</p>
+<p class="stat-meta" id="dash-kpi-cancellations-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">No-show</h3>
+<p class="stat-value" id="dash-kpi-no-show">—</p>
+<p class="stat-meta" id="dash-kpi-no-show-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Αξιοποίηση ωραρίου</h3>
+<p class="stat-value" id="dash-kpi-utilization">—</p>
+<p class="stat-meta" id="dash-kpi-utilization-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Ελεύθερα slots</h3>
+<p class="stat-value" id="dash-kpi-free-slots">—</p>
+<p class="stat-meta" id="dash-kpi-free-slots-meta">—</p>
+</article>
+    </div>
+
+    <div class="dashboard-grid">
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Ραντεβού ανά εργαζόμενο</h3>
+<ul class="dash-bars" id="dash-appointments-by-employee"></ul>
+<p class="dash-note">Με βάση το πλήθος ραντεβού ανά εργαζόμενο.</p>
+</article>
+
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Διάρκεια ραντεβού</h3>
+<div class="dash-list" id="dash-appointment-duration"></div>
+<p class="dash-note">Κατανομή διάρκειας από τις υπηρεσίες των ραντεβού.</p>
+</article>
+
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Ώρες αιχμής</h3>
+<div class="dash-heatmap" id="dash-heatmap"></div>
+<p class="dash-note">Μετράει πόσα ραντεβού υπάρχουν ανά ώρα για την ημερομηνία αναφοράς.</p>
+</article>
+    </div>
+  </div>
+
+  <div class="dash-tabpanel" role="tabpanel" id="dash-tabpanel-customers" aria-labelledby="dash-tab-customers" data-dash-tabpanel="customers" hidden>
+    <div class="dashboard-kpi-grid" aria-label="Δείκτες πελατών">
+      <article class="admin-card stat-card">
+<h3 class="stat-title">Σύνολο πελατών</h3>
+<p class="stat-value" id="dash-kpi-customers">—</p>
+<p class="stat-meta" id="dash-kpi-customers-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Ενεργοί (≤30ημ)</h3>
+<p class="stat-value" id="dash-kpi-active-customers">—</p>
+<p class="stat-meta" id="dash-kpi-active-customers-meta">—</p>
+</article>
+
+<article class="admin-card stat-card">
+<h3 class="stat-title">Νέοι πελάτες</h3>
+<p class="stat-value" id="dash-kpi-new-customers">—</p>
+<p class="stat-meta" id="dash-kpi-new-customers-meta">—</p>
+</article>
+
+</div>
+
+    <div class="dashboard-grid">
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Segments πελατών</h3>
+<div class="dash-segments" id="dash-customer-segments"></div>
+<p class="dash-note">Με βάση την «τελευταία επίσκεψη» που φαίνεται στους Πελάτες.</p>
+</article>
+
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Κορυφαίοι πελάτες (έσοδα)</h3>
+<div class="dash-list" id="dash-top-customers"></div>
+<p class="dash-note">Με βάση το σύνολο εσόδων ανά πελάτη.</p>
+</article>
+
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Προτιμήσεις υπηρεσιών</h3>
+<ul class="dash-bars" id="dash-customer-service-preferences"></ul>
+<p class="dash-note">Ποιες υπηρεσίες επιλέγουν συχνότερα οι πελάτες.</p>
+</article>
+
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Πελάτες προς επαναδραστηριοποίηση</h3>
+<div class="dash-list" id="dash-dormant-list"></div>
+<p class="dash-note">Με βάση το τελευταίο ραντεβού για υπενθυμίσεις ή κουπόνια.</p>
+</article>
+    </div>
+  </div>
+
+  <div class="dash-tabpanel" role="tabpanel" id="dash-tabpanel-exports" aria-labelledby="dash-tab-exports" data-dash-tabpanel="exports" hidden>
+    <div class="dashboard-grid">
+      <article class="admin-card dashboard-panel">
+<h3 class="dashboard-panel-title">Εξαγωγές</h3>
+<div class="dash-actions">
+<button type="button" class="btn-primary dash-export-btn" id="dash-export-customers">Εξαγωγή Πελατών (CSV)</button>
+<button type="button" class="btn-ghost dash-export-btn" id="dash-export-services">Εξαγωγή Υπηρεσιών (CSV)</button>
+<button type="button" class="btn-ghost dash-export-btn" id="dash-export-appointments">Εξαγωγή Ραντεβού Ημέρας (CSV)</button>
+</div>
+</article>
+    </div>
+  </div>
+
+  <div class="dash-tabpanel" role="tabpanel" id="dash-tabpanel-advanced" aria-labelledby="dash-tab-advanced" data-dash-tabpanel="advanced" hidden>
+    <div class="dashboard-grid">
+      <article class="admin-card dashboard-panel dashboard-panel--full">
+<h3 class="dashboard-panel-title">Προχωρημένοι δείκτες CRM</h3>
+<div class="dash-advanced">
+<div class="dash-advanced-item"><span>Ρυθμός ακύρωσης</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Ρυθμός no-show</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Rebooking rate (π.χ. σε 30 ημέρες)</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Retention ανά cohort</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>LTV ανά πελάτη</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Μέσος χρόνος μεταξύ επισκέψεων</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Απόδοση marketing καμπανιών</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Reviews / NPS</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Διαχείριση υπενθυμίσεων (SMS / Email)</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>RFM score ανά πελάτη</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Κίνδυνος αποχώρησης (churn)</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Συχνότητα επισκέψεων</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Μέσος χρόνος κράτησης πριν το ραντεβού</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Upsell / cross-sell rate</span><span class="dash-muted">—</span></div>
+<div class="dash-advanced-item"><span>Απόδοση εργαζομένων (ραντεβού/ώρα)</span><span class="dash-muted">—</span></div>
+</div>
+</article>
+    </div>
+  </div>
+</div>
+
+<p class="dash-updated" id="dash-last-updated">Τελευταία ενημέρωση: —</p>
+
+</section>
+</section>
+
+<section class="admin-section admin-section--visible" data-section="calendar">
+<section class="admin-block">
+<div class="admin-block-header">
+<div>
+<h2 class="admin-block-title">Ημερολόγιο ραντεβού</h2>
+<p class="admin-block-subtitle">
+                            Δες το πρόγραμμα σου ανά ημέρα ή ανά εβδομάδα.
+                        </p>
+</div>
+<div class="admin-block-actions calendar-actions">
+<input class="control control--date calendar-date" type="date"/>
+<button class="calendar-week-label calendar-week-pill" id="calendar-week-pill" type="button" aria-label="Επιλογή εβδομάδας">09-15 Δεκ 2025</button>
+<div aria-label="Επιλογή προβολής ημερολογίου" class="calendar-toggle" role="tablist">
+<button aria-pressed="true" class="control control--chip control--chip-active" data-calendar-view="day" type="button">
+                                Ημέρα
+                            </button>
+<button aria-pressed="false" class="control control--chip" data-calendar-view="week" type="button">
+                                Εβδομάδα
+                            </button>
+</div>
+</div>
+</div>
+<div class="calendar-schedule-controls">
+<span class="calendar-schedule-label">Προγράμματα:</span>
+<select class="calendar-schedule-select" id="calendar-schedule-select" aria-label="Προγράμματα προσωπικού">
+<option value="all" selected>Όλοι</option>
+<option value="e1">Άννα</option>
+<option value="e2">Μαρία</option>
+<option value="e3">Ελένη</option>
+</select>
+</div>
+<div class="calendar-day-view">
+<div class="appointments-list appointments-list--compact">
+<article class="appointment-card" data-employee="e1">
+<div class="appointment-main">
+<span class="appointment-time">09:30</span>
+<span class="appointment-service">Μανικιούρ κλασικό</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Ελένη Κ.</span>
+<span class="appointment-status appointment-status--completed">Ολοκληρώθηκε</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e2">
+<div class="appointment-main">
+<span class="appointment-time">11:00</span>
+<span class="appointment-service">Μανικιούρ ημιμόνιμο</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Βασιλική Παπαδοπούλου</span>
+<span class="appointment-status appointment-status--pending">Σε αναμονή</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e3">
+<div class="appointment-main">
+<span class="appointment-time">11:00</span>
+<span class="appointment-service">Πεντικιούρ spa</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Ελένη Κ.</span>
+<span class="appointment-status appointment-status--completed">Ολοκληρώθηκε</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e1">
+<div class="appointment-main">
+<span class="appointment-time">13:30</span>
+<span class="appointment-service">Πεντικιούρ spa</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Άννα Λ.</span>
+<span class="appointment-status appointment-status--pending">Σε αναμονή</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e3">
+<div class="appointment-main">
+<span class="appointment-time">16:00</span>
+<span class="appointment-service">Αποτρίχωση πόδια</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Δήμητρα Τ.</span>
+<span class="appointment-status appointment-status--completed">Ολοκληρώθηκε</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e2">
+<div class="appointment-main">
+<span class="appointment-time">15:00</span>
+<span class="appointment-service">Μακιγιάζ βραδινό</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Σοφία Μ.</span>
+<span class="appointment-status appointment-status--pending">Σε αναμονή</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e1">
+<div class="appointment-main">
+<span class="appointment-time">15:00</span>
+<span class="appointment-service">Θεραπεία προσώπου</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Γεωργία Ν.</span>
+<span class="appointment-status appointment-status--completed">Ολοκληρώθηκε</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e3">
+<div class="appointment-main">
+<span class="appointment-time">15:00</span>
+<span class="appointment-service">Φρύδια/σχηματισμός</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Μαρία Π.</span>
+<span class="appointment-status appointment-status--pending">Σε αναμονή</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e2">
+<div class="appointment-main">
+<span class="appointment-time">17:30</span>
+<span class="appointment-service">Χτένισμα</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Αλεξάνδρα Κ.</span>
+<span class="appointment-status appointment-status--pending">Σε αναμονή</span>
+</div>
+</article>
+<article class="appointment-card" data-employee="e1">
+<div class="appointment-main">
+<span class="appointment-time">18:15</span>
+<span class="appointment-service">Βαφή ριζών</span>
+</div>
+<div class="appointment-meta">
+<span class="appointment-client">Ιωάννα Π.</span>
+<span class="appointment-status appointment-status--completed">Ολοκληρώθηκε</span>
+</div>
+</article>
+</div>
+</div>
+<div class="calendar-week-view">
+<div class="calendar-preview">
+<div class="calendar-week-scroller">
+<div class="calendar-week-inner">
+<div class="calendar-preview-header">
+<span>Δευ</span>
+<span>Τρι</span>
+<span>Τετ</span>
+<span>Πεμ</span>
+<span>Παρ</span>
+<span>Σαβ</span>
+</div>
+<div class="calendar-preview-body">
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Ελένη Κ." data-status="completed">09:30<br/>Μανικιούρ κλασικό</div>
+<div class="calendar-slot calendar-slot--busy calendar-slot--stack" data-appointments="11:00|Μανικιούρ ημιμόνιμο|Βασιλική Παπαδοπούλου|pending|e2;11:00|Πεντικιούρ spa|Ελένη Κ.|completed|e3">11:00<br/>Μανικιούρ ημιμόνιμο<span class="calendar-slot-bubble" data-appointments="11:00|Μανικιούρ ημιμόνιμο|Βασιλική Παπαδοπούλου|pending|e2;11:00|Πεντικιούρ spa|Ελένη Κ.|completed|e3">2</span></div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Άννα Λ." data-status="pending">13:30<br/>Πεντικιούρ spa</div>
+<div class="calendar-slot calendar-slot--busy calendar-slot--stack" data-appointments="15:00|Μακιγιάζ βραδινό|Σοφία Μ.|pending|e2;15:00|Θεραπεία προσώπου|Γεωργία Ν.|completed|e1;15:00|Φρύδια/σχηματισμός|Μαρία Π.|pending|e3">15:00<br/>Μακιγιάζ βραδινό<span class="calendar-slot-bubble" data-appointments="15:00|Μακιγιάζ βραδινό|Σοφία Μ.|pending|e2;15:00|Θεραπεία προσώπου|Γεωργία Ν.|completed|e1;15:00|Φρύδια/σχηματισμός|Μαρία Π.|pending|e3">3</span></div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e3" data-client="Δήμητρα Τ." data-status="completed">16:00<br/>Αποτρίχωση πόδια</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e2" data-client="Αλεξάνδρα Κ." data-status="pending">17:30<br/>Χτένισμα</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Ιωάννα Π." data-status="completed">18:15<br/>Βαφή ριζών</div>
+</div>
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--busy calendar-slot--stack" data-appointments="10:00|Αποτρίχωση|Μαρία Π.|pending|e2;10:00|Μανικιούρ|Ελένη Κ.|completed|e3">10:00<br/>Αποτρίχωση<span class="calendar-slot-bubble" data-appointments="10:00|Αποτρίχωση|Μαρία Π.|pending|e2;10:00|Μανικιούρ|Ελένη Κ.|completed|e3">2</span></div>
+<div class="calendar-slot calendar-slot--free">14:30</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Κατερίνα Σ." data-status="pending">18:00<br/>Μανικιούρ</div>
+</div>
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--free">10:00</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e3" data-client="Νίκη Γ." data-status="pending">12:30<br/>Πεντικιούρ</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e2" data-client="Λίνα Χ." data-status="completed">19:00<br/>Μανικιούρ</div>
+</div>
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--busy" data-employee="e2" data-client="Μαργαρίτα Ζ." data-status="pending">11:00<br/>Αποτρίχωση</div>
+<div class="calendar-slot calendar-slot--free">15:30</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Ευγενία Σ." data-status="completed">19:30<br/>Πεντικιούρ</div>
+</div>
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--busy" data-employee="e1" data-client="Κλειώ Δ." data-status="completed">09:00<br/>Μανικιούρ</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e3" data-client="Ρένα Μ." data-status="pending">13:30<br/>Αποτρίχωση</div>
+<div class="calendar-slot calendar-slot--free">18:30</div>
+</div>
+<div class="calendar-column">
+<div class="calendar-slot calendar-slot--free">11:00</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e2" data-client="Στέλλα Β." data-status="pending">15:00<br/>Πεντικιούρ</div>
+<div class="calendar-slot calendar-slot--busy" data-employee="e3" data-client="Αριάδνη Λ." data-status="completed">18:00<br/>Μανικιούρ</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><div class="edit-panel" hidden="" id="appointment-inspect-panel">
+<h3 class="edit-panel-title" id="appointment-inspect-title">
+                        Λεπτομέρειες ραντεβού
+                    </h3>
+<div class="appointment-stack-nav" id="appointment-stack-nav" hidden="">
+<button class="appointment-stack-btn" id="appointment-stack-prev" type="button" aria-label="Προηγούμενο ραντεβού">&lsaquo;</button>
+<span class="appointment-stack-count" id="appointment-stack-count">1 / 1</span>
+<button class="appointment-stack-btn" id="appointment-stack-next" type="button" aria-label="Επόμενο ραντεβού">&rsaquo;</button>
+</div>
+<form id="appointment-inspect-form">
+<div class="edit-panel-grid">
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-date-input">
+                                    Ημερομηνία
+                                </label>
+<input class="edit-panel-input" id="appointment-date-input" name="date" type="date"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-time-input">
+                                    Ώρα
+                                </label>
+<input class="edit-panel-input" id="appointment-time-input" name="time" placeholder="π.χ. 09:30" type="text"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-client-input">
+                                    Πελάτης
+                                </label>
+<input class="edit-panel-input" id="appointment-client-input" name="client" placeholder="Όνομα πελάτη" type="text"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-service-input">
+                                    Υπηρεσία
+                                </label>
+<input class="edit-panel-input" id="appointment-service-input" name="service" placeholder="Τίτλος υπηρεσίας" type="text"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-employee-input">
+                                    Εργαζόμενος
+                                </label>
+<select class="edit-panel-input" id="appointment-employee-input" name="employee">
+<option value="">—</option>
+<option value="e1">Άννα</option>
+<option value="e2">Μαρία</option>
+<option value="e3">Ελένη</option>
+</select>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="appointment-status-input">
+                                    Κατάσταση
+                                </label>
+<select class="edit-panel-input" id="appointment-status-input" name="status">
+<option value="">—</option>
+<option value="pending">Σε αναμονή</option>
+<option value="completed">Ολοκληρώθηκε</option>
+<option value="no-show">No show</option>
+</select>
+</div>
+</div>
+<div class="edit-panel-actions">
+<button class="btn-primary" type="submit">
+                                Αποθήκευση
+                            </button>
+<button class="btn-ghost" id="appointment-cancel" type="button">
+                                Ακύρωση
+                            </button>
+<button class="btn-danger" id="appointment-delete" type="button">
+                                Διαγραφή
+                            </button>
+</div>
+</form>
+</div>
+</section>
+</section>
+<section class="admin-section" data-section="customers">
+<section class="admin-block">
+<div class="admin-block-header">
+<div>
+<h2 class="admin-block-title">Πελάτες</h2>
+<p class="admin-block-subtitle">
+                            Λίστα με τους πελάτες σου.
+                        </p>
+</div>
+<div class="admin-block-actions">
+<input class="control" id="customers-search-input" placeholder="Αναζήτηση ονόματος ή τηλεφώνου..." type="search"/>
+</div>
+</div>
+<div class="table-shell" id="customers-table">
+<div class="table-header">
+<span>Όνομα</span>
+<span>Τηλέφωνο</span>
+<span>Email</span>
+<span>Τελευταίο ραντεβού</span>
+<span>Σημειώσεις</span>
+</div>
+<div class="table-row">
+<span>Βασιλική Παπαδοπούλου</span>
+<span>69XXXXXXXX</span>
+<span>vasiliki@example.com</span>
+<span>10/12/2025 · Μανικιούρ</span>
+<span>Προτιμά απογεύματα</span>
+</div>
+<div class="table-row">
+<span>Άννα Λ.</span>
+<span>69XXXXXXXX</span>
+<span>anna.l@example.com</span>
+<span>09/12/2025 · Πεντικιούρ</span>
+<span></span>
+</div>
+<div class="table-row">
+<span>Δήμητρα Τ.</span>
+<span>69XXXXXXXX</span>
+<span>dimitra.t@example.com</span>
+<span>08/12/2025 · Αποτρίχωση</span>
+<span>Ευαισθησία στο κερί</span>
+</div>
+<div class="table-row">
+<span>Σοφία Μ.</span>
+<span>69XXXXXXXX</span>
+<span>sofia.m@example.com</span>
+<span>11/12/2025 · Μακιγιάζ</span>
+<span>Προτιμά φυσικό αποτέλεσμα</span>
+</div>
+<div class="table-row">
+<span>Γεωργία Ν.</span>
+<span>69XXXXXXXX</span>
+<span>georgia.n@example.com</span>
+<span>07/12/2025 · Θεραπεία προσώπου</span>
+<span>Ευαισθησία σε αρώματα</span>
+</div>
+<div class="table-row">
+<span>Ιωάννα Π.</span>
+<span>69XXXXXXXX</span>
+<span>ioanna.p@example.com</span>
+<span>05/12/2025 · Βαφή ριζών</span>
+<span>Χρειάζεται δοκιμή χρώματος</span>
+</div>
+</div>
+<div class="edit-panel" hidden="" id="customer-edit-panel">
+<h3 class="edit-panel-title" id="customer-edit-title">
+                        Επεξεργασία πελάτη
+                    </h3>
+<form id="customer-edit-form">
+<div class="edit-panel-grid">
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="customer-name-input">Όνομα</label>
+<input class="edit-panel-input" id="customer-name-input" name="name" placeholder="Πλήρες όνομα" required="" type="text"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="customer-phone-input">Τηλέφωνο</label>
+<input class="edit-panel-input" id="customer-phone-input" name="phone" placeholder="69XXXXXXXX" type="tel"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="customer-email-input">Email</label>
+<input class="edit-panel-input" id="customer-email-input" name="email" placeholder="email@domain.com" type="email"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="customer-lastappt-input">
+                                    Τελευταίο ραντεβού
+                                </label>
+<input class="edit-panel-input" id="customer-lastappt-input" name="lastAppointment" placeholder="π.χ. 10/12/2025 · Μανικιούρ" type="text"/>
+</div>
+<div class="edit-panel-field">
+<label class="edit-panel-label" for="customer-notes-input">Σημειώσεις</label>
+<input class="edit-panel-input" id="customer-notes-input" name="notes" placeholder="προτιμήσεις, ευαισθησίες κ.λπ." type="text"/>
+</div>
+<div class="edit-panel-field">
+<span class="edit-panel-label">Ιστορικό ραντεβού</span>
+<button class="btn-ghost customer-history-btn" id="customer-history-btn" type="button">Ιστορικό ραντεβού</button>
+</div>
+</div>
+<div class="edit-panel-actions">
+<button class="btn-primary" type="submit">
+                                Αποθήκευση
+                            </button>
+<button class="btn-ghost" id="customer-cancel-edit" type="button">
+                                Ακύρωση
+                            </button>
+<button class="btn-danger" id="customer-delete" type="button">
+                                Διαγραφή
+                            </button>
+</div>
+</form>
+</div>
+</section>
+</section>
+        <section class="admin-section" data-section="settings">
+            <section class="admin-block">
+                <div class="admin-block-header">
+                    <div>
+                        <h2 class="admin-block-title">Ρυθμίσεις καταστήματος</h2>
+                    </div>
+                </div>
+
+                <div class="settings-tabs-shell">
+                    <div class="settings-tabs" role="tablist" aria-label="Ρυθμίσεις">
+                        <button class="settings-tab settings-tab--active" id="settings-tab-employees" data-settings-tab="employees" role="tab" aria-selected="true" aria-controls="settings-panel-employees" type="button">
+                            Ρύθμιση προσωπικού
+                        </button>
+                        <button class="settings-tab" id="settings-tab-shop" data-settings-tab="shop" role="tab" aria-selected="false" aria-controls="settings-panel-shop" type="button">
+                            Ρυθμίσεις καταστήματος
+                        </button>
+                        <button class="settings-tab" id="settings-tab-login" data-settings-tab="login" role="tab" aria-selected="false" aria-controls="settings-panel-login" type="button">
+                            Ρυθμίσεις σύνδεσης
+                        </button>
+                    </div>
+
+                    <div class="settings-panels">
+                        <div class="settings-panel settings-panel--active" id="settings-panel-employees" data-settings-panel="employees" role="tabpanel" aria-labelledby="settings-tab-employees">
+                            <p class="settings-subtitle">Ρύθμιση προσωπικού</p>
+                            <p class="settings-note">Διαχειρίσου βασικές πληροφορίες εργαζομένων και κατάσταση διαθεσιμότητας.</p>
+                            <div class="settings-employee-list">
+                                <div class="settings-employee-card" data-employee="e1" data-services="Μανικιούρ ημιμόνιμο|Πεντικιούρ spa">
+                                    <div class="settings-employee-header">
+                                        <span class="settings-employee-name">Άννα</span>
+                                        <button class="settings-employee-offline" type="button" onclick="(function(btn){var p=document.getElementById('employee-offline-panel');if(!p)return;var card=btn.closest('.settings-employee-card');var key=card?card.dataset.employee:'';var nameEl=card?card.querySelector('.settings-employee-name'):null;var keyInput=document.getElementById('employee-offline-key');if(keyInput)keyInput.value=key;var nameTarget=document.getElementById('employee-offline-name');if(nameTarget)nameTarget.textContent=nameEl?nameEl.textContent.trim():'—';var start=document.getElementById('employee-offline-start');if(start)start.value='';var end=document.getElementById('employee-offline-end');if(end)end.value='';p.hidden=false;p.style.display='block';var o=document.getElementById('global-edit-overlay');if(o){o.hidden=false;o.style.display='block';document.body.classList.add('modal-open');}var s=document.querySelector('.admin-section.admin-section--visible[data-section=&quot;settings&quot;]');document.body.classList.toggle('overlay-in-settings',!!s);})(this);">Προσθήκη άδειας</button>
+                                        <button class="settings-employee-delete" type="button">Διαγραφή</button>
+                                    </div>
+                                    <div class="settings-employee-fields">
+                                        <div class="settings-employee-services">
+                                            <span class="settings-employee-services-title">Μενού υπηρεσιών</span>
+                                            <div class="settings-employee-services-list" data-employee-services></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="settings-employee-card" data-employee="e2" data-services="Μακιγιάζ βραδινό|Βαφή ριζών">
+                                    <div class="settings-employee-header">
+                                        <span class="settings-employee-name">Μαρία</span>
+                                        <button class="settings-employee-offline" type="button" onclick="(function(btn){var p=document.getElementById('employee-offline-panel');if(!p)return;var card=btn.closest('.settings-employee-card');var key=card?card.dataset.employee:'';var nameEl=card?card.querySelector('.settings-employee-name'):null;var keyInput=document.getElementById('employee-offline-key');if(keyInput)keyInput.value=key;var nameTarget=document.getElementById('employee-offline-name');if(nameTarget)nameTarget.textContent=nameEl?nameEl.textContent.trim():'—';var start=document.getElementById('employee-offline-start');if(start)start.value='';var end=document.getElementById('employee-offline-end');if(end)end.value='';p.hidden=false;p.style.display='block';var o=document.getElementById('global-edit-overlay');if(o){o.hidden=false;o.style.display='block';document.body.classList.add('modal-open');}var s=document.querySelector('.admin-section.admin-section--visible[data-section=&quot;settings&quot;]');document.body.classList.toggle('overlay-in-settings',!!s);})(this);">Προσθήκη άδειας</button>
+                                        <button class="settings-employee-delete" type="button">Διαγραφή</button>
+                                    </div>
+                                    <div class="settings-employee-fields">
+                                        <div class="settings-employee-services">
+                                            <span class="settings-employee-services-title">Μενού υπηρεσιών</span>
+                                            <div class="settings-employee-services-list" data-employee-services></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="settings-employee-card" data-employee="e3" data-services="Αποτρίχωση πόδια|Θεραπεία προσώπου">
+                                    <div class="settings-employee-header">
+                                        <span class="settings-employee-name">Ελένη</span>
+                                        <button class="settings-employee-offline" type="button" onclick="(function(btn){var p=document.getElementById('employee-offline-panel');if(!p)return;var card=btn.closest('.settings-employee-card');var key=card?card.dataset.employee:'';var nameEl=card?card.querySelector('.settings-employee-name'):null;var keyInput=document.getElementById('employee-offline-key');if(keyInput)keyInput.value=key;var nameTarget=document.getElementById('employee-offline-name');if(nameTarget)nameTarget.textContent=nameEl?nameEl.textContent.trim():'—';var start=document.getElementById('employee-offline-start');if(start)start.value='';var end=document.getElementById('employee-offline-end');if(end)end.value='';p.hidden=false;p.style.display='block';var o=document.getElementById('global-edit-overlay');if(o){o.hidden=false;o.style.display='block';document.body.classList.add('modal-open');}var s=document.querySelector('.admin-section.admin-section--visible[data-section=&quot;settings&quot;]');document.body.classList.toggle('overlay-in-settings',!!s);})(this);">Προσθήκη άδειας</button>
+                                        <button class="settings-employee-delete" type="button">Διαγραφή</button>
+                                    </div>
+                                    <div class="settings-employee-fields">
+                                        <div class="settings-employee-services">
+                                            <span class="settings-employee-services-title">Μενού υπηρεσιών</span>
+                                            <div class="settings-employee-services-list" data-employee-services></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-actions">
+                                <button type="button" class="btn-primary" id="btn-add-employee" onclick="(function(){var p=document.getElementById('employee-edit-panel');if(!p)return;p.hidden=false;p.style.display='block';var o=document.getElementById('global-edit-overlay');if(o){o.hidden=false;o.style.display='block';document.body.classList.add('modal-open');}var s=document.querySelector('.admin-section.admin-section--visible[data-section=&quot;settings&quot;]');document.body.classList.toggle('overlay-in-settings',!!s);})()">
+                                    + Νέα εργαζόμενη/ος
+                                </button>
+                            </div>
+                            <div class="edit-panel" hidden="" id="employee-edit-panel">
+                                <h3 class="edit-panel-title" id="employee-edit-title">
+                                    Νέος εργαζόμενος
+                                </h3>
+                                <form id="employee-edit-form">
+                                    <div class="edit-panel-grid">
+                                        <div class="edit-panel-field">
+                                            <label class="edit-panel-label" for="employee-name-input">Όνομα</label>
+                                            <input class="edit-panel-input" id="employee-name-input" name="name" placeholder="Όνομα εργαζόμενου" required="" type="text"/>
+                                        </div>
+                                        <div class="edit-panel-field edit-panel-field--full">
+                                            <label class="edit-panel-label">Μενού υπηρεσιών</label>
+                                            <div class="settings-employee-services-list" id="employee-services-picker"></div>
+                                        </div>
+                                    </div>
+                                    <div class="edit-panel-actions">
+                                        <button class="btn-primary" type="submit">
+                                            Αποθήκευση
+                                        </button>
+                                        <button class="btn-ghost" id="employee-cancel-edit" type="button" onclick="(function(){var p=document.getElementById('employee-edit-panel');if(p){p.hidden=true;p.style.display='none';}var o=document.getElementById('global-edit-overlay');if(o){o.hidden=true;o.style.display='none';document.body.classList.remove('modal-open');}document.body.classList.remove('overlay-in-settings');})()">
+                                            Ακύρωση
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel" id="settings-panel-shop" data-settings-panel="shop" role="tabpanel" aria-labelledby="settings-tab-shop">
+                            <div class="settings-section settings-section--services" id="settings-services">
+                                <div class="settings-section-header">
+                                    <div>
+                                        <p class="settings-subtitle">Υπηρεσίες &amp; τιμές</p>
+                                        <p class="settings-note">
+                                            Διαχείριση υπηρεσιών, διάρκειας και τιμών.
+                                        </p>
+                                    </div>
+                                    <button type="button" class="btn-primary" id="btn-new-service">
+                                        + Νέα υπηρεσία
+                                    </button>
+                                </div>
+                                <div class="table-shell table-shell--compact" id="services-table">
+                                    <div class="table-header">
+                                        <span>Κατηγορία</span>
+                                        <span>Υπηρεσία</span>
+                                        <span>Διάρκεια</span>
+                                        <span>Τιμή</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Μανικιούρ</span>
+                                        <span>Μανικιούρ ημιμόνιμο</span>
+                                        <span>60'</span>
+                                        <span>25€</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Πεντικιούρ</span>
+                                        <span>Πεντικιούρ spa</span>
+                                        <span>70'</span>
+                                        <span>30€</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Αποτρίχωση</span>
+                                        <span>Αποτρίχωση πόδια</span>
+                                        <span>45'</span>
+                                        <span>22€</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Μακιγιάζ</span>
+                                        <span>Μακιγιάζ βραδινό</span>
+                                        <span>50'</span>
+                                        <span>35€</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Περιποίηση</span>
+                                        <span>Θεραπεία προσώπου</span>
+                                        <span>60'</span>
+                                        <span>40€</span>
+                                    </div>
+                                    <div class="table-row">
+                                        <span>Χρώμα</span>
+                                        <span>Βαφή ριζών</span>
+                                        <span>75'</span>
+                                        <span>45€</span>
+                                    </div>
+                                </div>
+                                <p class="table-hint">
+                                    Πάτησε σε μια γραμμή για επεξεργασία ή χρησιμοποίησε το “+ Νέα υπηρεσία”.
+                                </p>
+                            </div>
+                            <div class="settings-section settings-section--hours">
+                                <p class="settings-subtitle">Ωράριο καταστήματος</p>
+                                <div class="settings-grid settings-hours-grid">
+                                <div class="field settings-day-row" data-day="monday">
+                                    <label class="field-label">Δευτέρα</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="monday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="monday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="monday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="monday" data-field="to" value="20:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field settings-day-row" data-day="tuesday">
+                                    <label class="field-label">Τρίτη</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="tuesday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="tuesday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="tuesday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="tuesday" data-field="to" value="20:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field settings-day-row" data-day="wednesday">
+                                    <label class="field-label">Τετάρτη</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="wednesday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="wednesday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="wednesday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="wednesday" data-field="to" value="20:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field settings-day-row" data-day="thursday">
+                                    <label class="field-label">Πέμπτη</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="thursday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="thursday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="thursday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="thursday" data-field="to" value="20:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field settings-day-row" data-day="friday">
+                                    <label class="field-label">Παρασκευή</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="friday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="friday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="friday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="friday" data-field="to" value="20:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field settings-day-row" data-day="saturday">
+                                    <label class="field-label">Σάββατο</label>
+                                    <div class="settings-day-controls">
+                                        <label class="settings-day-toggle">
+                                            <input type="checkbox" class="settings-day-open-toggle" data-day="saturday" checked>
+                                            <span>Ανοιχτό</span>
+                                        </label>
+                                        <div class="settings-intervals" data-day="saturday">
+                                            <div class="settings-interval">
+                                                <input type="time" class="control-input settings-time-input" data-day="saturday" data-field="from" value="10:00">
+                                                <span class="settings-time-separator">–</span>
+                                                <input type="time" class="control-input settings-time-input" data-day="saturday" data-field="to" value="16:00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="edit-panel" hidden="" id="service-edit-panel">
+                                <h3 class="edit-panel-title" id="service-edit-title">
+                                    Επεξεργασία υπηρεσίας
+                                </h3>
+                                <form id="service-edit-form">
+                                    <div class="edit-panel-grid">
+                                        <div class="edit-panel-field">
+                                            <label class="edit-panel-label" for="service-category-input">
+                                                Κατηγορία
+                                            </label>
+                                            <input class="edit-panel-input" id="service-category-input" name="category" placeholder="Μανικιούρ, Πεντικιούρ..." required="" type="text"/>
+                                        </div>
+                                        <div class="edit-panel-field">
+                                            <label class="edit-panel-label" for="service-name-input">
+                                                Υπηρεσία
+                                            </label>
+                                            <input class="edit-panel-input" id="service-name-input" name="name" placeholder="Όνομα υπηρεσίας" required="" type="text"/>
+                                        </div>
+                                        <div class="edit-panel-field">
+                                            <label class="edit-panel-label" for="service-duration-input">
+                                                Διάρκεια
+                                            </label>
+                                            <input class="edit-panel-input" id="service-duration-input" name="duration" placeholder="π.χ. 60'" type="text"/>
+                                        </div>
+                                        <div class="edit-panel-field">
+                                            <label class="edit-panel-label" for="service-price-input">
+                                                Τιμή
+                                            </label>
+                                            <input class="edit-panel-input" id="service-price-input" name="price" placeholder="π.χ. 25€" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="edit-panel-actions">
+                                        <button class="btn-primary" type="submit">
+                                            Αποθήκευση
+                                        </button>
+                                        <button class="btn-ghost" id="service-cancel-edit" type="button">
+                                            Ακύρωση
+                                        </button>
+                                        <button class="btn-danger" id="service-delete" type="button">
+                                            Διαγραφή
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel" id="settings-panel-login" data-settings-panel="login" role="tabpanel" aria-labelledby="settings-tab-login">
+                            <div class="settings-auth">
+                                <p class="settings-subtitle">Στοιχεία πρόσβασης</p>
+                                <div class="settings-actions settings-actions--stack">
+                                    <button type="button" class="btn-primary" id="btn-change-password">
+                                        Αλλαγή κωδικού πρόσβασης
+                                    </button>
+                                    <button type="button" class="btn-ghost" id="btn-booking-form">
+                                        Φόρμα κράτησης
+                                    </button>
+                                    <button type="button" class="btn-ghost" id="btn-logout">
+                                        Αποσύνδεση
+                                    </button>
+                                </div>
+                                <p class="settings-note" id="settings-message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+</main>
+</div>
+<div class="edit-panel" hidden="" id="employee-offline-panel">
+    <h3 class="edit-panel-title">Offline ημερομηνίες</h3>
+    <form id="employee-offline-form">
+        <input type="hidden" id="employee-offline-key" name="employeeKey"/>
+        <div class="edit-panel-grid">
+            <div class="edit-panel-field edit-panel-field--full">
+                <span class="edit-panel-label">Εργαζόμενος</span>
+                <strong id="employee-offline-name">—</strong>
+            </div>
+            <div class="edit-panel-field">
+                <label class="edit-panel-label" for="employee-offline-start">Από</label>
+                <input class="edit-panel-input" id="employee-offline-start" name="start" required="" type="date"/>
+            </div>
+            <div class="edit-panel-field">
+                <label class="edit-panel-label" for="employee-offline-end">Έως (προαιρετικό)</label>
+                <input class="edit-panel-input" id="employee-offline-end" name="end" type="date"/>
+            </div>
+        </div>
+        <p class="edit-panel-note">Αφήστε το “Έως” κενό για μία ημέρα.</p>
+        <div class="edit-panel-actions">
+            <button class="btn-primary" type="submit">Αποθήκευση</button>
+            <button class="btn-ghost" id="employee-offline-cancel" type="button" onclick="(function(){var p=document.getElementById('employee-offline-panel');if(p){p.hidden=true;p.style.display='none';}var o=document.getElementById('global-edit-overlay');if(o){o.hidden=true;o.style.display='none';document.body.classList.remove('modal-open');}document.body.classList.remove('overlay-in-settings');})()">Ακύρωση</button>
+        </div>
+    </form>
+</div>
+<div class="edit-panel" hidden="" id="customer-history-panel">
+    <h3 class="edit-panel-title">Ιστορικό ραντεβού</h3>
+    <p class="edit-panel-note" id="customer-history-name">—</p>
+    <div class="customer-history-list" id="customer-history-list"></div>
+    <div class="edit-panel-actions">
+        <button class="btn-ghost" id="customer-history-close" type="button">Κλείσιμο</button>
+    </div>
+</div>
+<div class="edit-panel" hidden="" id="calendar-overlap-panel">
+    <h3 class="edit-panel-title">Πολλαπλά ραντεβού</h3>
+    <div class="calendar-overlap-list" id="calendar-overlap-list"></div>
+    <div class="calendar-overlap-nav">
+        <button class="calendar-overlap-arrow" id="calendar-overlap-prev" type="button" aria-label="Προηγούμενο ραντεβού">&lsaquo;</button>
+        <span class="calendar-overlap-counter" id="calendar-overlap-counter">1 / 1</span>
+        <button class="calendar-overlap-arrow" id="calendar-overlap-next" type="button" aria-label="Επόμενο ραντεβού">&rsaquo;</button>
+    </div>
+    <div class="calendar-overlap-detail">
+        <div class="calendar-overlap-field">
+            <span>Ώρα</span>
+            <strong id="calendar-overlap-time">--:--</strong>
+        </div>
+        <div class="calendar-overlap-field">
+            <span>Υπηρεσία</span>
+            <strong id="calendar-overlap-service">-</strong>
+        </div>
+        <div class="calendar-overlap-field">
+            <span>Πελάτης</span>
+            <strong id="calendar-overlap-client">-</strong>
+        </div>
+        <div class="calendar-overlap-field">
+            <span>Κατάσταση</span>
+            <strong id="calendar-overlap-status">-</strong>
+        </div>
+        <div class="calendar-overlap-field">
+            <span>Εργαζόμενος</span>
+            <strong id="calendar-overlap-employee">-</strong>
+        </div>
+    </div>
+    <div class="edit-panel-actions">
+        <button class="btn-ghost" id="calendar-overlap-close" type="button">Κλείσιμο</button>
+    </div>
+</div>
+<div class="edit-overlay" hidden="" id="global-edit-overlay" onclick="(function(){var p=document.getElementById('employee-edit-panel');if(p){p.hidden=true;p.style.display='none';}var off=document.getElementById('employee-offline-panel');if(off){off.hidden=true;off.style.display='none';}document.body.classList.remove('overlay-in-settings');})()"></div>
+<button aria-label="Νέο ραντεβού" class="floating-add-appointment" id="btn-new-appointment" type="button">
+    +
+</button>
+<script src="admin.js"></script>
+<script>
+(function () {
+    function bindNavToggle() {
+        var nav = document.querySelector('.admin-nav');
+        var navToggle = document.querySelector('.admin-nav-toggle');
+        if (!nav || !navToggle) return;
+        if (navToggle.dataset.navToggleBound === '1') return;
+        navToggle.dataset.navToggleBound = '1';
+        navToggle.setAttribute('aria-expanded', nav.classList.contains('admin-nav--open') ? 'true' : 'false');
+        navToggle.addEventListener('click', function () {
+            var willOpen = !nav.classList.contains('admin-nav--open');
+            nav.classList.toggle('admin-nav--open', willOpen);
+            navToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+    }
+
+    bindNavToggle();
+
+    function initFallback() {
+        if (window.__adminJsReady) return;
+
+        const navItems = document.querySelectorAll('.admin-nav-item');
+        const sections = document.querySelectorAll('.admin-section');
+        const dayView = document.querySelector('.calendar-day-view');
+        const weekView = document.querySelector('.calendar-week-view');
+        const viewButtons = document.querySelectorAll('[data-calendar-view]');
+        const calendarDateInput = document.querySelector('.calendar-date');
+        const weekPill = document.querySelector('.calendar-week-pill');
+        const inspectPanel = document.getElementById('appointment-inspect-panel');
+        const inspectCancel = document.getElementById('appointment-cancel');
+        const inspectOverlay = document.getElementById('global-edit-overlay');
+        const btnNew = document.getElementById('btn-new-appointment');
+        const btnNewService = document.getElementById('btn-new-service');
+        const customersTable = document.getElementById('customers-table');
+        const servicesTable = document.getElementById('services-table');
+        const customerPanel = document.getElementById('customer-edit-panel');
+        const servicePanel = document.getElementById('service-edit-panel');
+        const customerCancel = document.getElementById('customer-cancel-edit');
+        const serviceCancel = document.getElementById('service-cancel-edit');
+        const customerDelete = document.getElementById('customer-delete');
+        const serviceDelete = document.getElementById('service-delete');
+
+        function showSection(key, activeItem) {
+            if (!key) return;
+            sections.forEach((section) => {
+                section.classList.toggle('admin-section--visible', section.dataset.section === key);
+            });
+            navItems.forEach((item) => {
+                item.classList.toggle('admin-nav-item--active', item === activeItem);
+            });
+        }
+
+        navItems.forEach((item) => {
+            item.addEventListener('click', () => {
+                showSection(item.dataset.section, item);
+            });
+        });
+
+        function setPickerVisibility(view) {
+            const isDayView = view !== 'week';
+
+            if (calendarDateInput) {
+                calendarDateInput.classList.toggle('calendar-date--hidden', !isDayView);
+            }
+
+            if (weekPill) {
+                weekPill.style.display = isDayView ? 'none' : 'inline-flex';
+                weekPill.hidden = isDayView;
+            }
+        }
+
+        function toISODate(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatWeekLabel(baseDate) {
+            const base = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+            const weekday = base.getDay();
+            const daysFromMonday = (weekday + 6) % 7;
+            const monday = new Date(base);
+            monday.setDate(base.getDate() - daysFromMonday);
+            const saturday = new Date(monday);
+            saturday.setDate(monday.getDate() + 5);
+
+            const ddStart = String(monday.getDate()).padStart(2, '0');
+            const ddEnd = String(saturday.getDate()).padStart(2, '0');
+            const monthStart = monday.toLocaleDateString('el-GR', { month: 'short' });
+            const monthEnd = saturday.toLocaleDateString('el-GR', { month: 'short' });
+            const yearStart = monday.getFullYear();
+            const yearEnd = saturday.getFullYear();
+
+            if (yearStart === yearEnd && monthStart === monthEnd) {
+                return `${ddStart}-${ddEnd} ${monthStart} ${yearStart}`;
+            }
+            if (yearStart === yearEnd) {
+                return `${ddStart} ${monthStart} - ${ddEnd} ${monthEnd} ${yearStart}`;
+            }
+            return `${ddStart} ${monthStart} ${yearStart} - ${ddEnd} ${monthEnd} ${yearEnd}`;
+        }
+
+        function updateWeekPillLabel() {
+            if (!weekPill) return;
+            const baseDate = calendarDateInput && calendarDateInput.value
+                ? new Date(calendarDateInput.value + 'T00:00:00')
+                : new Date();
+            weekPill.textContent = formatWeekLabel(baseDate);
+        }
+
+        if (calendarDateInput && !calendarDateInput.value) {
+            calendarDateInput.value = toISODate(new Date());
+        }
+
+        updateWeekPillLabel();
+
+        viewButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.calendarView;
+                viewButtons.forEach((b) => b.classList.toggle('control--chip-active', b === btn));
+                if (dayView) dayView.style.display = view === 'week' ? 'none' : 'block';
+                if (weekView) weekView.style.display = view === 'week' ? 'block' : 'none';
+                setPickerVisibility(view);
+            });
+        });
+
+        if (weekPill && calendarDateInput) {
+            weekPill.addEventListener('click', () => {
+                const wasHidden = calendarDateInput.classList.contains('calendar-date--hidden');
+                let restoreHidden = null;
+
+                if (wasHidden) {
+                    calendarDateInput.classList.remove('calendar-date--hidden');
+                    restoreHidden = () => {
+                        calendarDateInput.classList.add('calendar-date--hidden');
+                        calendarDateInput.removeEventListener('blur', restoreHidden);
+                        calendarDateInput.removeEventListener('change', restoreHidden);
+                    };
+                    calendarDateInput.addEventListener('blur', restoreHidden);
+                    calendarDateInput.addEventListener('change', restoreHidden);
+                }
+                if (typeof calendarDateInput.showPicker === 'function') {
+                    if (typeof calendarDateInput.focus === 'function') {
+                        calendarDateInput.focus({ preventScroll: true });
+                    }
+                    calendarDateInput.showPicker();
+                } else {
+                    calendarDateInput.focus();
+                    calendarDateInput.click();
+                }
+            });
+        }
+
+        if (calendarDateInput) {
+            calendarDateInput.addEventListener('change', () => {
+                updateWeekPillLabel();
+            });
+        }
+
+        let initialView = 'day';
+        viewButtons.forEach((btn) => {
+            if (btn.classList.contains('control--chip-active')) {
+                initialView = btn.dataset.calendarView || 'day';
+            }
+        });
+        setPickerVisibility(initialView);
+
+        function setOverlayVisible(visible) {
+            if (inspectOverlay) {
+                inspectOverlay.hidden = !visible;
+                inspectOverlay.style.display = visible ? 'block' : 'none';
+            }
+            document.body.classList.toggle('modal-open', visible);
+        }
+
+        function openInspect(card) {
+            if (!inspectPanel) return;
+            inspectPanel.hidden = false;
+            inspectPanel.style.display = 'block';
+            setOverlayVisible(true);
+
+            if (card) {
+                let timeText = '';
+                let serviceText = '';
+                let clientText = '';
+
+                if (card.classList.contains('calendar-slot')) {
+                    const parts = card.textContent.split('\n').map((t) => t.trim()).filter(Boolean);
+                    timeText = parts[0] || '';
+                    serviceText = parts[1] || '';
+                } else {
+                    const time = card.querySelector('.appointment-time, .calendar-appointment-time');
+                    const service = card.querySelector('.appointment-service, .calendar-appointment-title');
+                    const client = card.querySelector('.appointment-client, .calendar-appointment-client');
+                    timeText = time ? time.textContent.trim() : '';
+                    serviceText = service ? service.textContent.trim() : '';
+                    clientText = client ? client.textContent.trim() : '';
+                }
+
+                const timeInput = document.getElementById('appointment-time-input');
+                const serviceInput = document.getElementById('appointment-service-input');
+                const clientInput = document.getElementById('appointment-client-input');
+                if (timeInput) timeInput.value = timeText;
+                if (serviceInput) serviceInput.value = serviceText;
+                if (clientInput) clientInput.value = clientText;
+            }
+        }
+
+        function closeInspect() {
+            if (inspectPanel) {
+                inspectPanel.hidden = true;
+                inspectPanel.style.display = 'none';
+            }
+            setOverlayVisible(false);
+        }
+
+        function openPanel(panel) {
+            if (!panel) return;
+            panel.hidden = false;
+            panel.style.display = 'block';
+            setOverlayVisible(true);
+        }
+
+        function closePanel(panel) {
+            if (!panel) return;
+            panel.hidden = true;
+            panel.style.display = 'none';
+            setOverlayVisible(false);
+        }
+
+        function prepareCustomerPanel(isNew) {
+            if (!customerPanel) return;
+            const nameInput = document.getElementById('customer-name-input');
+            const phoneInput = document.getElementById('customer-phone-input');
+            const emailInput = document.getElementById('customer-email-input');
+            const lastInput = document.getElementById('customer-lastappt-input');
+            const notesInput = document.getElementById('customer-notes-input');
+            if (isNew) {
+                if (nameInput) nameInput.value = '';
+                if (phoneInput) phoneInput.value = '';
+                if (emailInput) emailInput.value = '';
+                if (lastInput) lastInput.value = '';
+                if (notesInput) notesInput.value = '';
+                if (customerDelete) customerDelete.style.display = 'none';
+            } else {
+                if (customerDelete) customerDelete.style.display = 'inline-flex';
+            }
+        }
+
+        function prepareServicePanel(isNew) {
+            if (!servicePanel) return;
+            const categoryInput = document.getElementById('service-category-input');
+            const nameInput = document.getElementById('service-name-input');
+            const durationInput = document.getElementById('service-duration-input');
+            const priceInput = document.getElementById('service-price-input');
+            if (isNew) {
+                if (categoryInput) categoryInput.value = '';
+                if (nameInput) nameInput.value = '';
+                if (durationInput) durationInput.value = '';
+                if (priceInput) priceInput.value = '';
+                if (serviceDelete) serviceDelete.style.display = 'none';
+            } else {
+                if (serviceDelete) serviceDelete.style.display = 'inline-flex';
+            }
+        }
+
+        function fillCustomerPanel(row) {
+            if (!row || !customerPanel) return;
+            prepareCustomerPanel(false);
+            const cells = row.querySelectorAll('span, div');
+            const nameInput = document.getElementById('customer-name-input');
+            const phoneInput = document.getElementById('customer-phone-input');
+            const emailInput = document.getElementById('customer-email-input');
+            const lastInput = document.getElementById('customer-lastappt-input');
+            const notesInput = document.getElementById('customer-notes-input');
+            if (nameInput) nameInput.value = (cells[0] ? cells[0].textContent : '').trim();
+            if (phoneInput) phoneInput.value = (cells[1] ? cells[1].textContent : '').trim();
+            if (emailInput) emailInput.value = (cells[2] ? cells[2].textContent : '').trim();
+            if (lastInput) lastInput.value = (cells[3] ? cells[3].textContent : '').trim();
+            if (notesInput) notesInput.value = (cells[4] ? cells[4].textContent : '').trim();
+        }
+
+        function fillServicePanel(row) {
+            if (!row || !servicePanel) return;
+            prepareServicePanel(false);
+            const cells = row.querySelectorAll('span, div');
+            const categoryInput = document.getElementById('service-category-input');
+            const nameInput = document.getElementById('service-name-input');
+            const durationInput = document.getElementById('service-duration-input');
+            const priceInput = document.getElementById('service-price-input');
+            if (categoryInput) categoryInput.value = (cells[0] ? cells[0].textContent : '').trim();
+            if (nameInput) nameInput.value = (cells[1] ? cells[1].textContent : '').trim();
+            if (durationInput) durationInput.value = (cells[2] ? cells[2].textContent : '').trim();
+            if (priceInput) priceInput.value = (cells[3] ? cells[3].textContent : '').trim();
+        }
+
+        if (dayView) {
+            dayView.addEventListener('click', (e) => {
+                const card = e.target.closest('.appointment-card, .calendar-appointment');
+                if (!card) return;
+                openInspect(card);
+            });
+        }
+
+        if (weekView) {
+            weekView.addEventListener('click', (e) => {
+                const slot = e.target.closest('.calendar-slot--busy');
+                if (!slot) return;
+                openInspect(slot);
+            });
+        }
+
+        if (customersTable) {
+            customersTable.addEventListener('click', (e) => {
+                const row = e.target.closest('.table-row');
+                if (!row) return;
+                fillCustomerPanel(row);
+                openPanel(customerPanel);
+            });
+        }
+
+        if (servicesTable) {
+            servicesTable.addEventListener('click', (e) => {
+                const row = e.target.closest('.table-row');
+                if (!row) return;
+                fillServicePanel(row);
+                openPanel(servicePanel);
+            });
+        }
+
+        if (btnNew) {
+            btnNew.addEventListener('click', () => {
+                const activeSection = document.querySelector('.admin-section.admin-section--visible');
+                const activeKey = activeSection ? activeSection.dataset.section : 'calendar';
+                if (activeKey === 'customers') {
+                    prepareCustomerPanel(true);
+                    openPanel(customerPanel);
+                } else if (activeKey === 'settings') {
+                    prepareServicePanel(true);
+                    openPanel(servicePanel);
+                } else {
+                    openInspect(null);
+                }
+            });
+        }
+
+        if (btnNewService) {
+            btnNewService.addEventListener('click', () => {
+                prepareServicePanel(true);
+                openPanel(servicePanel);
+            });
+        }
+
+        if (inspectCancel) {
+            inspectCancel.addEventListener('click', closeInspect);
+        }
+
+        if (customerCancel) {
+            customerCancel.addEventListener('click', () => closePanel(customerPanel));
+        }
+
+        if (serviceCancel) {
+            serviceCancel.addEventListener('click', () => closePanel(servicePanel));
+        }
+
+        if (inspectOverlay) {
+            inspectOverlay.addEventListener('click', () => {
+                closeInspect();
+                closePanel(customerPanel);
+                closePanel(servicePanel);
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFallback);
+    } else {
+        initFallback();
+    }
+})();
+
+(function () {
+    function initSettingsStandalone() {
+        if (typeof window.initSettingsUI === 'function') {
+            window.initSettingsUI();
+            return;
+        }
+
+        const settingsSection = document.querySelector('.admin-section[data-section="settings"]');
+        if (!settingsSection) return;
+
+        const tabButtons = Array.from(settingsSection.querySelectorAll('.settings-tab[data-settings-tab]'));
+        const tabPanels = Array.from(settingsSection.querySelectorAll('.settings-panel[data-settings-panel]'));
+        const servicesTable = document.getElementById('services-table');
+
+        function activateTab(key) {
+            tabButtons.forEach((btn) => {
+                const isActive = btn.dataset.settingsTab === key;
+                btn.classList.toggle('settings-tab--active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.settingsPanel === key;
+                panel.classList.toggle('settings-panel--active', isActive);
+                panel.hidden = !isActive;
+            });
+        }
+
+        if (tabButtons.length) {
+            const activeBtn = tabButtons.find((btn) => btn.classList.contains('settings-tab--active')) || tabButtons[0];
+            const initialKey = activeBtn ? activeBtn.dataset.settingsTab : 'employees';
+            activateTab(initialKey);
+            tabButtons.forEach((btn) => {
+                btn.addEventListener('click', () => activateTab(btn.dataset.settingsTab));
+            });
+        }
+
+        if (!servicesTable) return;
+        const serviceRows = Array.from(servicesTable.querySelectorAll('.table-row'));
+        const serviceNames = serviceRows.map((row) => {
+            const cells = row.querySelectorAll('span, div');
+            return cells[1] ? cells[1].textContent.trim() : '';
+        }).filter(Boolean);
+
+        settingsSection.querySelectorAll('.settings-employee-card[data-employee]').forEach((card) => {
+            const list = card.querySelector('[data-employee-services]');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!serviceNames.length) {
+                list.textContent = 'Δεν υπάρχουν υπηρεσίες.';
+                return;
+            }
+            serviceNames.forEach((name) => {
+                const label = document.createElement('label');
+                label.className = 'settings-service-item';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = name;
+                input.checked = true;
+                const text = document.createElement('span');
+                text.textContent = name;
+                label.appendChild(input);
+                label.appendChild(text);
+                list.appendChild(label);
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSettingsStandalone);
+    } else {
+        initSettingsStandalone();
+    }
+})();
+
+(function () {
+    function initDashboardStandalone() {
+        if (window.__dashTabsReady) return;
+        window.__dashTabsReady = true;
+
+        const dashboardSection = document.querySelector('.admin-section[data-section="dashboard"]');
+        if (!dashboardSection) return;
+
+        const tabButtons = Array.from(dashboardSection.querySelectorAll('.dash-tab[data-dash-tab]'));
+        const tabPanels = Array.from(dashboardSection.querySelectorAll('.dash-tabpanel[data-dash-tabpanel]'));
+        const dateSelect = dashboardSection.querySelector('#dash-date-range');
+        const dateInput = dashboardSection.querySelector('#dash-date-input');
+        const yearSelect = dashboardSection.querySelector('#dash-year-select');
+        const halfYearSelect = dashboardSection.querySelector('#dash-half-year-select');
+        const datePreview = dashboardSection.querySelector('#dash-ref-date');
+        let lastDateSelection = null;
+
+        function activateTab(key) {
+            tabButtons.forEach((btn) => {
+                const isActive = btn.dataset.dashTab === key;
+                btn.classList.toggle('dash-tab--active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.dashTabpanel === key;
+                panel.hidden = !isActive;
+            });
+        }
+
+        if (tabButtons.length) {
+            const activeBtn = tabButtons.find((btn) => btn.classList.contains('dash-tab--active')) || tabButtons[0];
+            const initialKey = activeBtn ? activeBtn.dataset.dashTab : 'economics';
+            activateTab(initialKey);
+            tabButtons.forEach((btn) => {
+                btn.addEventListener('click', () => activateTab(btn.dataset.dashTab));
+            });
+        }
+
+        function pad2(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function formatShortDate(date) {
+            return date.toLocaleDateString('el-GR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function getWeekRange(baseDate) {
+            const base = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+            const weekday = base.getDay();
+            const daysFromMonday = (weekday + 6) % 7;
+            const monday = new Date(base);
+            monday.setDate(base.getDate() - daysFromMonday);
+            const saturday = new Date(monday);
+            saturday.setDate(monday.getDate() + 5);
+            return { start: monday, end: saturday };
+        }
+
+        function toDateInputValue(date) {
+            return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+        }
+
+        function toMonthInputValue(date) {
+            return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}`;
+        }
+
+        function getISOWeekString(date) {
+            const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const day = utcDate.getUTCDay() || 7;
+            utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
+            const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+            const weekNumber = Math.ceil((((utcDate - yearStart) / 86400000) + 1) / 7);
+            return `${utcDate.getUTCFullYear()}-W${pad2(weekNumber)}`;
+        }
+
+        function getISOWeekStart(weekValue) {
+            if (!weekValue) return null;
+            const parts = weekValue.split('-W');
+            if (parts.length !== 2) return null;
+            const year = Number(parts[0]);
+            const week = Number(parts[1]);
+            if (!Number.isFinite(year) || !Number.isFinite(week)) return null;
+            const jan4 = new Date(Date.UTC(year, 0, 4));
+            const jan4Day = jan4.getUTCDay() || 7;
+            const mondayWeek1 = new Date(jan4);
+            mondayWeek1.setUTCDate(jan4.getUTCDate() - (jan4Day - 1));
+            const monday = new Date(mondayWeek1);
+            monday.setUTCDate(mondayWeek1.getUTCDate() + (week - 1) * 7);
+            return new Date(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate());
+        }
+
+        function getBaseDateFromInput() {
+            if (!dateInput || !dateInput.value) return new Date();
+            if (dateInput.type === 'week') {
+                return getISOWeekStart(dateInput.value) || new Date();
+            }
+            if (dateInput.type === 'month') {
+                const parts = dateInput.value.split('-').map(Number);
+                if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+                    return new Date(parts[0], parts[1] - 1, 1);
+                }
+                return new Date();
+            }
+            return new Date(`${dateInput.value}T00:00:00`);
+        }
+
+        function getCurrentYear() {
+            return new Date().getFullYear();
+        }
+
+        function clampYear(year, fallbackYear) {
+            const safeYear = Number.isFinite(year) ? year : fallbackYear;
+            return Math.min(safeYear, getCurrentYear());
+        }
+
+        function ensureYearOptions(baseYear) {
+            if (!yearSelect) return clampYear(baseYear, getCurrentYear());
+            const currentYear = getCurrentYear();
+            const earliest = currentYear - 10;
+            const safeYear = clampYear(baseYear, currentYear);
+            yearSelect.innerHTML = '';
+            for (let year = earliest; year <= currentYear; year += 1) {
+                const option = document.createElement('option');
+                option.value = String(year);
+                option.textContent = String(year);
+                yearSelect.appendChild(option);
+            }
+            return Math.min(Math.max(safeYear, earliest), currentYear);
+        }
+
+        function getYearValue(fallbackDate) {
+            const selected = yearSelect ? Number(yearSelect.value) : NaN;
+            return clampYear(selected, fallbackDate.getFullYear());
+        }
+
+        function setHalfYearAvailability(selectedYear) {
+            if (!halfYearSelect) return;
+            const currentYear = getCurrentYear();
+            const currentHalf = new Date().getMonth() < 6 ? 'H1' : 'H2';
+            const h1Option = halfYearSelect.querySelector('option[value="H1"]');
+            const h2Option = halfYearSelect.querySelector('option[value="H2"]');
+            if (h1Option) h1Option.disabled = false;
+            if (h2Option) h2Option.disabled = false;
+
+            if (selectedYear === currentYear && currentHalf === 'H1') {
+                if (h2Option) h2Option.disabled = true;
+            }
+
+            if (halfYearSelect.value !== 'H1' && halfYearSelect.value !== 'H2') {
+                halfYearSelect.value = selectedYear === currentYear ? currentHalf : 'H2';
+            }
+
+            if (selectedYear === currentYear && currentHalf === 'H1') {
+                halfYearSelect.value = 'H1';
+            }
+        }
+
+        function applyDashboardDateLimits() {
+            if (!dateInput || dateInput.hidden) return;
+            const today = new Date();
+            dateInput.min = '';
+            if (dateInput.type === 'week') {
+                dateInput.max = getISOWeekString(today);
+            } else if (dateInput.type === 'month') {
+                dateInput.max = toMonthInputValue(today);
+            } else {
+                dateInput.max = toDateInputValue(today);
+            }
+        }
+
+        function syncDashboardDateControls() {
+            if (!dateSelect) return;
+            const selection = dateSelect.value || 'day';
+            const today = new Date();
+            let baseDate = getBaseDateFromInput();
+            if (selection !== lastDateSelection) {
+                baseDate = today;
+            } else if (baseDate.getTime() > today.getTime()) {
+                baseDate = today;
+            }
+            const usesDateInput = ['day', 'week', 'month', 'custom'].includes(selection);
+            const usesYear = ['year', 'half-year'].includes(selection);
+            const usesHalfYear = selection === 'half-year';
+
+            if (dateInput) {
+                dateInput.hidden = !usesDateInput;
+                if (usesDateInput) {
+                    if (selection === 'week') {
+                        dateInput.type = 'week';
+                        dateInput.value = getISOWeekString(baseDate);
+                    } else if (selection === 'month') {
+                        dateInput.type = 'month';
+                        dateInput.value = toMonthInputValue(baseDate);
+                    } else {
+                        dateInput.type = 'date';
+                        dateInput.value = toDateInputValue(baseDate);
+                    }
+                }
+            }
+
+            if (yearSelect) {
+                yearSelect.hidden = !usesYear;
+                if (usesYear) {
+                    const baseYear = getYearValue(baseDate);
+                    const safeYear = ensureYearOptions(baseYear);
+                    yearSelect.value = String(safeYear);
+                }
+            }
+
+            if (halfYearSelect) {
+                halfYearSelect.hidden = !usesHalfYear;
+                if (usesHalfYear) {
+                    const selectedYear = getYearValue(baseDate);
+                    setHalfYearAvailability(selectedYear);
+                }
+            }
+
+            if (usesDateInput) {
+                applyDashboardDateLimits();
+            }
+
+            lastDateSelection = selection;
+        }
+
+        function updateDatePreview() {
+            if (!dateSelect || !datePreview) return;
+            const selection = dateSelect.value || 'day';
+            const today = new Date();
+
+            if (selection === 'year') {
+                const yearValue = getYearValue(today);
+                datePreview.textContent = String(yearValue);
+                return;
+            }
+
+            if (selection === 'half-year') {
+                const yearValue = getYearValue(today);
+                const halfValue = halfYearSelect && (halfYearSelect.value === 'H2' || halfYearSelect.value === 'H1')
+                    ? halfYearSelect.value
+                    : (today.getMonth() < 6 ? 'H1' : 'H2');
+                const startMonth = halfValue === 'H2' ? 6 : 0;
+                const start = new Date(yearValue, startMonth, 1);
+                const end = new Date(yearValue, startMonth + 6, 0);
+                const startLabel = start.toLocaleDateString('el-GR', { month: 'short', year: 'numeric' });
+                const endLabel = end.toLocaleDateString('el-GR', { month: 'short', year: 'numeric' });
+                datePreview.textContent = `${startLabel} - ${endLabel}`;
+                return;
+            }
+
+            let baseDate = today;
+            if (dateInput && dateInput.value) {
+                if (selection === 'week') {
+                    baseDate = getISOWeekStart(dateInput.value) || today;
+                } else if (selection === 'month') {
+                    const parts = dateInput.value.split('-').map(Number);
+                    if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+                        baseDate = new Date(parts[0], parts[1] - 1, 1);
+                    }
+                } else {
+                    baseDate = new Date(`${dateInput.value}T00:00:00`);
+                }
+            }
+
+            if (selection === 'custom') {
+                datePreview.textContent = formatShortDate(baseDate);
+                return;
+            }
+
+            if (selection === 'week') {
+                const range = getWeekRange(baseDate);
+                datePreview.textContent = `${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
+                return;
+            }
+
+            if (selection === 'month') {
+                datePreview.textContent = baseDate.toLocaleDateString('el-GR', { month: 'long', year: 'numeric' });
+                return;
+            }
+
+            datePreview.textContent = formatShortDate(baseDate);
+        }
+
+        if (dateSelect) {
+            dateSelect.addEventListener('change', () => {
+                syncDashboardDateControls();
+                updateDatePreview();
+            });
+        }
+        if (dateInput) {
+            dateInput.addEventListener('change', updateDatePreview);
+        }
+        if (yearSelect) {
+            yearSelect.addEventListener('change', () => {
+                if (dateSelect && dateSelect.value === 'half-year') {
+                    setHalfYearAvailability(getYearValue(new Date()));
+                }
+                updateDatePreview();
+            });
+        }
+        if (halfYearSelect) {
+            halfYearSelect.addEventListener('change', updateDatePreview);
+        }
+        syncDashboardDateControls();
+        updateDatePreview();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDashboardStandalone);
+    } else {
+        initDashboardStandalone();
+    }
+})();
+</script>
+</body>
+</html>
+
+
